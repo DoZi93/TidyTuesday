@@ -6,5 +6,51 @@ output: html_notebook
 # Load necessities
 ```{r}
 library(tidyverse)
+library(naniar)
+```
+
+```{r}
+WWTP.data <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-20/HydroWASTE_v10.csv")
+```
+# Load a list of continents and countries
+```{r}
+Continents.countries.list <- read_csv("https://raw.githubusercontent.com/dbouquin/IS_608/master/NanosatDB_munging/Countries-Continents.csv") %>%
+  mutate(Country = case_when(Country == "CZ" ~ "Czech Republic",
+                               Country == "Russian Federation" ~ "Russia",
+                               Country == "US" ~ "United States",
+                             TRUE ~ Country)) # all other values remain the same
+```
+
+
+# Inspect data
+```{r}
+print(colnames(WWTP.data))
+tibble(WWTP.data)
+```
+
+```{r}
+naniar::vis_miss(WWTP.data, warn_large_data = F)
+```
+
+```{r}
+Countries.morethan.100.wwtp <- WWTP.data %>%
+  group_by(COUNTRY) %>%
+  count() %>%
+  filter(n > 100) %>%
+  select(COUNTRY)
+
+WWTP.data.filtered <- WWTP.data %>%
+  filter(COUNTRY %in% Countries.morethan.100.wwtp$COUNTRY &
+           STATUS != "Closed" &
+           POP_SERVED != 0) %>%
+  left_join(Continents.countries.list, by = c("COUNTRY" = "Country")) %>%
+  mutate(DischargePerPerson = WASTE_DIS/POP_SERVED) %>%
+  group_by(COUNTRY) %>%
+  mutate(DischargePerCountry = mean(DischargePerPerson)) %>%
+  group_by(Continent) %>%
+  mutate(DischargePerContinent = mean(DischargePerPerson)) %>%
+  ungroup() %>%
+  mutate(DischargePerPersonDiff = log2(DischargePerCountry/DischargePerContinent))
+
 ```
 
