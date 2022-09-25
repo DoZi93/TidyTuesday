@@ -94,29 +94,48 @@ Country <- WWTP.data.filtered %>%
 
 ```{r}
 dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
+  geom_rect(xmin = min(WWTP.data.filtered$DischargePerPerson),
+            xmax = max(WWTP.data.filtered$DischargePerPerson) + 0.3,
+            ymin = -Inf,
+            ymax = 5.5,
+            fill = "#D57E7E",
+            alpha = 0.01) +
+  geom_rect(xmin = min(WWTP.data.filtered$DischargePerPerson),
+            xmax = max(WWTP.data.filtered$DischargePerPerson) + 0.3,
+            ymin = 5.5,
+            ymax = Inf,
+            fill = "#CEE5D0",
+            alpha = 0.03) +
   geom_segment(aes(x = DischargePerPerson,
                    y = COUNTRY,
                    xend = Country$DischargePerPerson,
                    yend = Country$COUNTRY),
                linetype = "dotted",
-               alpha = .5,
+               alpha = .8,
                data = Continent) +
   geom_point(aes(x = DischargePerPerson, y = COUNTRY, shape = Scale),
-             size = 2,
+             size = 2.2,
              fill = "#E4BAD4",
              color = "black") +
   scale_shape_manual(values = c(21,22)) +
   theme_minimal() +
   ylab("") +
-  theme(text = element_text(size = 10, family = font_headlines,
+  xlab("\nDischarge per Person") +
+  theme(text = element_text(size = 9, family = font_headlines,
                             color = "#000000"),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text (size = 13),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 11),
+        legend.key.size = unit(2, "line"),
     plot.background = element_rect(fill = "#E0EAEC",
                                        color = "#E0EAEC"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major.x = element_line(color = "grey70",
                                           size=0.1,
-                                          linetype = "dashed"))
+                                          linetype = "dashed")) +
+  guides(shape = guide_legend(override.aes = list(size = 2.4)))
 
 plot(dumbbell.DischargeDiff.Country.Continent)
 ```
