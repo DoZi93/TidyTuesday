@@ -7,6 +7,7 @@ output: html_notebook
 ```{r}
 library(tidyverse)
 library(naniar)
+library(showtext)
 ```
 
 ```{r}
@@ -19,6 +20,15 @@ Continents.countries.list <- read_csv("https://raw.githubusercontent.com/dbouqui
                                Country == "Russian Federation" ~ "Russia",
                                Country == "US" ~ "United States",
                              TRUE ~ Country)) # all other values remain the same
+```
+# Add font
+```{r}
+font_add_google("Montserrat")
+font_headlines <- "Montserrat"
+font_add_google("Cousine")
+font_text <- "Cousine"
+
+showtext_auto()
 ```
 
 
@@ -50,7 +60,64 @@ WWTP.data.filtered <- WWTP.data %>%
   group_by(Continent) %>%
   mutate(DischargePerContinent = mean(DischargePerPerson)) %>%
   ungroup() %>%
-  mutate(DischargePerPersonDiff = log2(DischargePerCountry/DischargePerContinent))
+  distinct(DischargePerCountry, .keep_all = T) %>%
+  mutate(DischargePerPersonDiff = DischargePerContinent - DischargePerCountry) %>%
+  arrange(DischargePerPersonDiff) %>%
+  .[c(1:5, (dim(.)[1]-4):(dim(.)[1])),] %>%
+  select(c("COUNTRY", "Continent", "DischargePerCountry":"DischargePerContinent")) %>%
+  pivot_longer(cols = c(DischargePerContinent, DischargePerCountry)) %>%
+  rename("Scale" = "name",
+         "DischargePerPerson" = "value") %>%
+  mutate(Scale = case_when(Scale == "DischargePerCountry" ~ "Country",
+                           Scale == "DischargePerContinent" ~ "Continent"))
+  
+WWTP.data.filtered$COUNTRY <- factor(WWTP.data.filtered$COUNTRY, 
+                                     levels = c("South Africa",
+                                                         "Canada",
+                                                         "India",
+                                                         "Ireland",
+                                                         "Romania",
+                                                         "Turkey",
+                                                         "Iran",
+                                                         "Mexico",
+                                                         "Egypt",
+                                                         "Algeria"
+                                                         ))
 
+Continent <- WWTP.data.filtered %>%
+  filter(Scale == "Continent")
+
+Country <- WWTP.data.filtered %>%
+  filter(Scale == "Country")
+```
+
+
+```{r}
+dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
+  geom_segment(aes(x = DischargePerPerson,
+                   y = COUNTRY,
+                   xend = Country$DischargePerPerson,
+                   yend = Country$COUNTRY),
+               linetype = "dotted",
+               alpha = .5,
+               data = Continent) +
+  geom_point(aes(x = DischargePerPerson, y = COUNTRY, shape = Scale),
+             size = 2,
+             fill = "#E4BAD4",
+             color = "black") +
+  scale_shape_manual(values = c(21,22)) +
+  theme_minimal() +
+  ylab("") +
+  theme(text = element_text(size = 10, family = font_headlines,
+                            color = "#000000"),
+    plot.background = element_rect(fill = "#E0EAEC",
+                                       color = "#E0EAEC"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_line(color = "grey70",
+                                          size=0.1,
+                                          linetype = "dashed"))
+
+plot(dumbbell.DischargeDiff.Country.Continent)
 ```
 
