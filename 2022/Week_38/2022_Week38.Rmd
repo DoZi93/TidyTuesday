@@ -8,6 +8,7 @@ output: html_notebook
 library(tidyverse)
 library(naniar)
 library(showtext)
+library(ggtext)
 ```
 
 ```{r}
@@ -122,6 +123,9 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
   theme_minimal() +
   ylab("") +
   xlab("\nDischarge per Person") +
+  labs(title = "Average discharge per person of countries worldwide compared 
+  <p style='line-height:16px'> to their respective continents average. Plot shows the 5 countries </p><p style='line-height:16px> with the highest positive and negative difference.</p><p style='font-size: 10px'> Data based on countries with > 100 WWTPs </p>") +
+  xlim(values = c(0,8)) +
   theme(text = element_text(size = 9, family = font_headlines,
                             color = "#000000"),
         legend.position = "top",
@@ -132,7 +136,7 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
         legend.title = element_blank(),
         legend.text = element_text(size = 11),
         legend.key.size = unit(2, "line"),
-        plot.margin = margin(0,0,0,1.7, "cm"),
+        plot.title = element_markdown(),
         plot.background = element_rect(fill = "#E0EAEC",
                                        color = "#E0EAEC"),
         panel.grid.major = element_blank(),
