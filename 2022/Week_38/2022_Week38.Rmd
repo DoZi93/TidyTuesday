@@ -9,8 +9,10 @@ library(tidyverse)
 library(naniar)
 library(showtext)
 library(ggtext)
+library(stringr)
 ```
 
+# Load data
 ```{r}
 WWTP.data <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-20/HydroWASTE_v10.csv")
 ```
@@ -28,33 +30,29 @@ font_add_google("Montserrat")
 font_headlines <- "Montserrat"
 font_add_google("Cousine")
 font_text <- "Cousine"
+font_add_google("")
 
 showtext_auto()
 ```
 
 
-# Inspect data
+# Data preparation
 ```{r}
-print(colnames(WWTP.data))
-tibble(WWTP.data)
-```
-
-```{r}
-naniar::vis_miss(WWTP.data, warn_large_data = F)
-```
-
-```{r}
+# Filter out all countries with less than 101 WWTP
 Countries.morethan.100.wwtp <- WWTP.data %>%
   group_by(COUNTRY) %>%
   count() %>%
   filter(n > 100) %>%
   select(COUNTRY)
 
+# Filter for countries with > 100 WWTPs
 WWTP.data.filtered <- WWTP.data %>%
   filter(COUNTRY %in% Countries.morethan.100.wwtp$COUNTRY &
            STATUS != "Closed" &
            POP_SERVED != 0) %>%
+# add continent column to the original dataset
   left_join(Continents.countries.list, by = c("COUNTRY" = "Country")) %>%
+# calculate Discharge per person and the average for country and continent
   mutate(DischargePerPerson = WASTE_DIS/POP_SERVED) %>%
   group_by(COUNTRY) %>%
   mutate(DischargePerCountry = mean(DischargePerPerson)) %>%
@@ -63,7 +61,9 @@ WWTP.data.filtered <- WWTP.data %>%
   ungroup() %>%
   distinct(DischargePerCountry, .keep_all = T) %>%
   mutate(DischargePerPersonDiff = DischargePerContinent - DischargePerCountry) %>%
+# sort by Discharge difference and
   arrange(DischargePerPersonDiff) %>%
+# select the 5 highest positive and 5 highest negative differences
   .[c(1:5, (dim(.)[1]-4):(dim(.)[1])),] %>%
   select(c("COUNTRY", "Continent", "DischargePerCountry":"DischargePerContinent")) %>%
   pivot_longer(cols = c(DischargePerContinent, DischargePerCountry)) %>%
@@ -84,7 +84,7 @@ WWTP.data.filtered$COUNTRY <- factor(WWTP.data.filtered$COUNTRY,
                                                          "Egypt",
                                                          "Algeria"
                                                          ))
-
+# prepare data for the dumbbell plot
 Continent <- WWTP.data.filtered %>%
   filter(Scale == "Continent")
 
@@ -92,7 +92,18 @@ Country <- WWTP.data.filtered %>%
   filter(Scale == "Country")
 ```
 
+# Define strings to use in plot
+```{r}
+plottitle = "Average discharge per person per country worldwide compared to their respective continents average.<br>The Plot shows the top 5 countries discharging less (<span style='color:#7b9f66'>green</span>) and more (<span style='color: #d57e7e'>red</span>) than the average of the continent."
 
+plotsubtitle = "Data based on countries with > 100 WWTPs."
+
+plotcaption = str_wrap("Source: Macedo et al 2022 
+                       Code: DoZi93/TidyTuesday")
+```
+
+
+# Plot the dumbbell plot
 ```{r}
 dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
   geom_rect(xmin = min(WWTP.data.filtered$DischargePerPerson),
@@ -106,7 +117,7 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
             ymin = 5.5,
             ymax = Inf,
             fill = "#CEE5D0",
-            alpha = 0.025) +
+            alpha = 0.04) +
   geom_segment(aes(x = DischargePerPerson,
                    y = COUNTRY,
                    xend = Country$DischargePerPerson,
@@ -116,29 +127,39 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
               size = 2,
                data = Continent) +
   geom_point(aes(x = DischargePerPerson, y = COUNTRY, shape = Scale),
-             size = 2.3,
-             fill = "#6495ed",
+             size = 1.7,
+             fill = "#a6c3f7",
              color = "black") +
   scale_shape_manual(values = c(22,21)) +
   theme_minimal() +
   ylab("") +
   xlab("\nDischarge per Person") +
-  labs(title = "Average discharge per person of countries worldwide compared 
-  <p style='line-height:16px'> to their respective continents average. Plot shows the 5 countries </p><p style='line-height:16px> with the highest positive and negative difference.</p><p style='font-size: 10px'> Data based on countries with > 100 WWTPs </p>") +
+  labs(title = plottitle,
+       subtitle = plotsubtitle,
+       caption = plotcaption) +
   xlim(values = c(0,8)) +
-  theme(text = element_text(size = 9, family = font_headlines,
+  theme(text = element_text(family = font_headlines,
                             color = "#000000"),
+        plot.caption = element_markdown(size = 12),
         legend.position = "top",
         legend.justification = "left",
         legend.direction = "horizontal",
-        axis.text = element_text(size = 12),
-        axis.title.x = element_text (size = 13),
         legend.title = element_blank(),
-        legend.text = element_text(size = 11),
-        legend.key.size = unit(2, "line"),
-        plot.title = element_markdown(),
-        plot.background = element_rect(fill = "#E0EAEC",
-                                       color = "#E0EAEC"),
+        legend.text = element_text(size = 18),
+        legend.key.size = unit(1.3, "line"),
+        legend.margin = margin(t = -6),
+        axis.text = element_text(size = 25),
+        axis.title.x = element_text (size = 22,
+                                     vjust = 6),
+        
+        plot.title = element_markdown(size = 19,
+                                      lineheight = .5,
+                                      family = font_text),
+        plot.subtitle = element_markdown(size = 16,
+                                         vjust = -1.3,
+                                         family = font_text),
+        plot.background = element_rect(fill = "#fafaf0",
+                                       color = "#fafaf0"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major.x = element_line(color = "grey70",
@@ -147,5 +168,7 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
   guides(shape = guide_legend(override.aes = list(size = 2.4)))
 
 plot(dumbbell.DischargeDiff.Country.Continent)
+
+ggsave("TidyTuesday_Week38.jpg")
 ```
 
