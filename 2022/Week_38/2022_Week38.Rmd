@@ -10,6 +10,7 @@ library(naniar)
 library(showtext)
 library(ggtext)
 library(stringr)
+library(fontawesome)
 ```
 
 # Load data
@@ -30,13 +31,16 @@ font_add_google("Montserrat")
 font_headlines <- "Montserrat"
 font_add_google("Cousine")
 font_text <- "Cousine"
-font_add_google("")
+# get the path of font awesome
+fa_brands_path <- systemfonts::font_info(family = "Font Awesome 6 Brands")[["path"]]
+# add the font under the name of "fa-brands"
+font_add(family = "fa-brands", fa_brands_path)
 
 showtext_auto()
 ```
 
 
-# Data preparation
+# Data wrangling
 ```{r}
 # Filter out all countries with less than 101 WWTP
 Countries.morethan.100.wwtp <- WWTP.data %>%
@@ -98,10 +102,8 @@ plottitle = "Average discharge per person per country worldwide compared to thei
 
 plotsubtitle = "Data based on countries with > 100 WWTPs."
 
-plotcaption = str_wrap("Source: Macedo et al 2022 
-                       Code: DoZi93/TidyTuesday")
+plotcaption = str_wrap("Source: Macedo et al 2022 <span style='font-family:\"fa-brands\"'>&#xf09b;</span> DoZi93/TidyTuesday #TidyTuesday #rstats")
 ```
-
 
 # Plot the dumbbell plot
 ```{r}
@@ -122,10 +124,9 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
                    y = COUNTRY,
                    xend = Country$DischargePerPerson,
                    yend = Country$COUNTRY),
-              # linetype = "dotted",
-               alpha = .1,
+              alpha = .1,
               size = 2,
-               data = Continent) +
+              data = Continent) +
   geom_point(aes(x = DischargePerPerson, y = COUNTRY, shape = Scale),
              size = 1.7,
              fill = "#a6c3f7",
@@ -140,7 +141,6 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
   xlim(values = c(0,8)) +
   theme(text = element_text(family = font_headlines,
                             color = "#000000"),
-        plot.caption = element_markdown(size = 12),
         legend.position = "top",
         legend.justification = "left",
         legend.direction = "horizontal",
@@ -151,7 +151,6 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
         axis.text = element_text(size = 25),
         axis.title.x = element_text (size = 22,
                                      vjust = 6),
-        
         plot.title = element_markdown(size = 19,
                                       lineheight = .5,
                                       family = font_text),
@@ -160,6 +159,7 @@ dumbbell.DischargeDiff.Country.Continent <- ggplot(data = WWTP.data.filtered) +
                                          family = font_text),
         plot.background = element_rect(fill = "#fafaf0",
                                        color = "#fafaf0"),
+        plot.caption = element_markdown(size = 14),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.grid.major.x = element_line(color = "grey70",
