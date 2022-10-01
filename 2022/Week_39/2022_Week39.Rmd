@@ -1,18 +1,56 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "TidyTuesday Week 39"
+author: "Dominik Ziaja"
+date: "2022-10-01"
+output:
+  html_document:
+    toc: true
+    number_section: true
+    toc_float: true
+    code_folding: hide
+    theme: cerulean
 ---
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
+# Loading necessities
 ```{r}
-plot(cars)
+library(tidyverse)
+library(showtext)
+library(fontawesome)
+library(stringr)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+# Setting up fonts that are used
+```{r}
+font_add_google("Montserrat")
+font_headlines <- "Montserrat"
+font_add_google("Cousine")
+font_text <- "Cousine"
+# get the path of font awesome
+fa_brands_path <- systemfonts::font_info(family = "Font Awesome 6 Brands")[["path"]]
+# add the font under the name of "fa-brands"
+font_add(family = "fa-brands", fa_brands_path)
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+showtext_auto()
+```
+
+# Define color-palettes
+```{r}
+
+```
+
+# Load data
+```{r}
+data.artists <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-27/artists.csv')
+```
+
+```{r}
+library(naniar)
+
+naniar::vis_miss(data.artists)
+
+tibble(data.artists)
+
+data.artists %>%
+  summarise_all(~n_distinct(.))
+```
+
