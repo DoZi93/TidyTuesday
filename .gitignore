@@ -40,3 +40,5 @@ vignettes/*.pdf
 
 # Created R-Notebook html files
 *.html
+*.nb.html
+*.nb
