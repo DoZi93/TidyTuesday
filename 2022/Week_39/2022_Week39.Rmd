@@ -124,9 +124,7 @@ data.hexa <- data.artists.tidied %>%
 ```{r}
 title.string <- "Most dominant artist groups in the US workforce by race"
 
-subtitle.string <- "Overall, artists across all races and the US prefer working in design. However, compared to hispanic and white artists, most African-american artists in the middle states of the US prefer to engage in music. \nAsians and other races only show in some states, scattered across the whole US, the highest number in employed artists in various disciplines."
-
-caption.string <- "Source: Macedo et al 2022 <span style='font-family:\"fa-brands\"'>&#xf09b;</span> DoZi93/TidyTuesday #TidyTuesday #rstats"
+caption.string <- "<span style='font-family:\"fa-brands\"'>&#xf09b;</span> DoZi93/TidyTuesday #TidyTuesday #rstats"
 ```
 
 
@@ -150,7 +148,6 @@ plot.hexa.artistsshare <- ggplot(data = data.hexa) +
                                "Writing",
                                "No artists in workforce")) +
   labs(title = title.string,
-       subtitle = subtitle.string,
        caption = caption.string) +
   theme_classic(base_size = 24) +
   theme(
