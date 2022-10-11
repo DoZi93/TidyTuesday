@@ -20,6 +20,7 @@ library(tidyverse)
 library(ggtext)
 library(naniar)
 library(broom)
+library(waffle)
 ```
 
 # Loading in dataset
@@ -33,5 +34,49 @@ colnames(data)
 
 head(data, 5)
 tibble(data)
+```
+
+# Find out the 5 most successfull hunters
+```{r}
+top5.hunters <- data %>%
+  separate_rows(category_tags)
+```
+
+# data wrangling tags hunted by hunters
+```{r}
+top.tags <- data %>%
+  separate_rows(category_tags) %>%
+  filter(category_tags != "") %>%
+  mutate(year = str_extract(release_date, "\\d{4}")) %>%
+  group_by(year, category_tags) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  group_by(year) %>%
+  top_n(10)
+```
+
+```{r}
+# Data
+df <- data.frame(group = LETTERS[1:3],
+                 value = c(25, 20, 35))
+
+# Waffle plot
+ggplot(df, aes(fill = group, values = value)) +
+  geom_waffle(n_rows = 8, size = 0.33, colour = "white") +
+  scale_fill_manual(name = NULL,
+                    values = c("#BA182A", "#FF8288", "#FFDBDD"),
+                    labels = c("A", "B", "C")) +
+  coord_equal() +
+  theme_void()
+```
+
+
+```{r}
+ggplot(data = filter(top.tags, year == 2017), aes(fill = category_tags, values = n)) +
+  geom_waffle(n_rows = 8, size = 0.33,
+              make_proportional = TRUE) +
+  facet_wrap(~year) +
+  coord_equal() +
+  theme_void()
 ```
 
