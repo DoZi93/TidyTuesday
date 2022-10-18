@@ -1,0 +1,27 @@
+---
+title: "Tidy Tuesday Week 42 - Stranger Things Dialogue"
+author: "Dominik Ziaja"
+date: "2022-10-18"
+output:
+  html_document:
+    toc: true
+    number_section: true
+    toc_float: true
+    code_folding: hide
+    theme: cerulean
+---
+
+# Load in necessary stuff
+```{r}
+# Load in the tidyverse
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(purrr)
+library(tibble)
+library(stringr)
+library(forcats)
+library()
+```
+
