@@ -22,6 +22,52 @@ library(purrr)
 library(tibble)
 library(stringr)
 library(forcats)
-library()
+library(tidytext)
+```
+
+```{r}
+strangerthings_episodes <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-18/episodes.csv")
+strangerthings_dialogues <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-18/stranger_things_all_dialogue.csv")
+```
+
+```{r}
+strangerthings_episodes %>%
+  glimpse()
+
+strangerthings_dialogues %>%
+  glimpse()
+
+```
+
+
+```{r}
+strangerthings_songs <- strangerthings_dialogues %>%
+  filter(grepl("♪", dialogue)) %>%
+  unnest_tokens(word, dialogue) %>%
+  mutate(word = tolower(word)) %>%
+  anti_join(get_stopwords()) %>%
+  inner_join(get_sentiments("bing")) %>%
+  group_by(season) %>%
+  count(sentiment)
+```
+
+```{r}
+ggplot() +
+  geom_segment(data = filter(strangerthings_songs, sentiment == "positive"),
+               aes(x = season - 0.1, xend = season - 0.1, y = 0, yend = n),
+               size = 2, alpha = .7) +
+  geom_point(data =  filter(strangerthings_songs, sentiment == "positive"),
+             aes(x = season - 0.1, y = n),
+             size = 4, alpha = .7) +
+  geom_segment(data = filter(strangerthings_songs, sentiment == "negative"),
+               aes(x = season + 0.1, xend = season + 0.1, y = 0, yend = -n),
+               size = 2, alpha = .7) +
+  geom_point(data =  filter(strangerthings_songs, sentiment == "negative"),
+             aes(x = season + 0.1, y = -n),
+             size = 4, alpha = .7) +
+  annotate("text", x = c(1,2,3,4), y = max(strangerthings_songs$n)+10, 
+           label = paste("Season", c("1", "2", "3", "4"), sep = " ")) +
+  geom_rect() +
+  theme_void()
 ```
 
