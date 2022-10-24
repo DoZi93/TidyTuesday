@@ -30,9 +30,8 @@ library(showtext)
 ```
 # Setting up Fonts to use
 ```{r}
-font_add_google("Cormorant Garamond", "cormogar")
-font_text <- "cormogar"
 font_add("benguiat", "BenguiatFont/BenguiatStd-Book.otf")
+font_text <- "benguiat"
 # get the path of font awesome
 fa_brands_path <- systemfonts::font_info(family = "Font Awesome 6 Brands")[["path"]]
 # add the font under the name of "fa-brands"
@@ -46,23 +45,23 @@ showtext_auto()
 geom.colors <- "#872222"
 geom.positive.glow.colors <- "#e6dcdc"
 geom.negative.glow.colors <- "#FF0000"
+title.color <- "#CC0000"
+plot.text.color <- "#7f0000"
 ```
 
+# Write title and subtitle
+```{r}
+plot.title <- "Stranger Things"
+plot.subtitle <- "Total negative and positive sentiment score\n of all lyrics sung during the four seasons.\n"
+```
+
+# Load data
 ```{r}
 strangerthings_episodes <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-18/episodes.csv")
 strangerthings_dialogues <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-18/stranger_things_all_dialogue.csv")
 ```
 
-```{r}
-strangerthings_episodes %>%
-  glimpse()
-
-strangerthings_dialogues %>%
-  glimpse()
-
-```
-
-
+# Tidy dataframe
 ```{r}
 strangerthings_songs <- strangerthings_dialogues %>%
   filter(grepl("♪", dialogue)) %>%
@@ -74,7 +73,7 @@ strangerthings_songs <- strangerthings_dialogues %>%
   group_by(season) %>%
   count(sentiment)
 ```
-
+# Plot
 ```{r}
 ggplot() +
   # Draw lollipops facing up with positive sentiment
@@ -101,14 +100,19 @@ ggplot() +
     colour = geom.negative.glow.colors, sigma = 5) +
   annotate("text", 
            x = c(1,2,3,4),
-           y = max(strangerthings_songs$n)+10, 
+           y = max(strangerthings_songs$n)+16, 
            label = paste("Season",c("1", "2", "3", "4"), sep = " "),
-           family = "benguiat",
-           colour = "#7f0000") +
+           family = font_text,
+           colour = plot.text.color) +
   geom_rect() +
   theme_void() +
-  labs(title = "Stranger\nThings", size = 30,
-       color = "#fa0202") +
+  labs(title = plot.title, 
+       subtitle = plot.subtitle) +
+  ylab("Sentiment value") +
+  scale_y_continuous(limits = c(-45, 60),
+                     breaks = seq(-40,40, by = 20),
+                     labels = c("-40", "-20", "0", "20", "40"),
+                     ) +
   # Setting the theme of the plot
   coord_cartesian(clip = "off") +
   theme(panel.grid.major.y = element_line(colour = "#2b0707",
@@ -116,10 +120,21 @@ ggplot() +
                                           size = .5),
         plot.background = element_rect(fill = "#0E0D0D"),
         plot.title = element_text(size = 30,
-                                  color = "#CC0000",
+                                  color = title.color,
                                   hjust = 0.5,
-                                  family = "benguiat"))
-  # Blured rectangles below the title
-  
+                                  family = font_text),
+        plot.subtitle = element_text(size = 14,
+                                     color = plot.text.color,
+                                     hjust = 0.5,
+                                     vjust = -0.2,
+                                     family = font_text),
+        axis.text.y = element_text(color = plot.text.color,
+                                   margin = margin(r = 30),
+                                   family = font_text),
+        axis.title.y = element_text(color = plot.text.color,
+                                    size = 14,
+                                    margin = margin(r = 10),
+                                    angle = 90,
+                                    family = font_text))
 ```
 
