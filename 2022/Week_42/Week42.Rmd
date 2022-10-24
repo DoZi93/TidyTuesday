@@ -49,10 +49,11 @@ title.color <- "#CC0000"
 plot.text.color <- "#7f0000"
 ```
 
-# Write title and subtitle
+# Write title, subtitle and caption
 ```{r}
 plot.title <- "Stranger Things"
 plot.subtitle <- "Total negative and positive sentiment score of all lyrics sung in the series"
+caption.string <- "<span style='font-family:\"fa-brands\"'>&#xf09b;</span> DoZi93/TidyTuesday #TidyTuesday #rstats"
 ```
 
 # Load data
@@ -108,7 +109,8 @@ ggplot() +
   geom_rect() +
   theme_void() +
   labs(title = plot.title, 
-       subtitle = plot.subtitle) +
+       subtitle = plot.subtitle,
+       caption = caption.string) +
   ylab("Sentiment value") +
   scale_y_continuous(limits = c(-45, 60),
                      breaks = seq(-40,40, by = 20),
@@ -124,11 +126,14 @@ ggplot() +
                                   color = title.color,
                                   hjust = 0.5,
                                   family = font_text),
-        plot.subtitle = element_markdown(size = 38,
+        plot.subtitle = element_text(size = 38,
                                      color = plot.text.color,
                                      hjust = 0.5,
                                      vjust = -0.2,
                                      family = font_text),
+        plot.caption = element_text(size = 12,
+                                    color = plot.text.color,
+                                    family = font_text),
         axis.text.y = element_text(color = plot.text.color,
                                    margin = margin(r = 30),
                                    family = font_text,
