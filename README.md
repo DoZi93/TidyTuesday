@@ -3,6 +3,10 @@ Repository for the up and coming TidyTuesday challenges set by the absolutely am
 
 ## Submissions for the different weeks
 
+### Week 42
+The dataset provided included all dialogue lines of all episodes of Stranger Things. I filtered for all songs in there and calculated the sentiment values of them.
+![](2022/Week_42/TidyTuesday_Week42.jpg)
+
 ### Week 39
 This weeks dataset was all about the artists in the workforce of the US. Since I wanted to always use the geom_polygon function <br>
 together to show "factorial" semi-spatial data (US states for example), I decided to color the different states based on which artist field <br>

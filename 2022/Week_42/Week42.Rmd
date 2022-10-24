@@ -136,5 +136,7 @@ ggplot() +
                                     margin = margin(r = 10),
                                     angle = 90,
                                     family = font_text))
+
+ggsave("TidyTuesday_Week42.jpg", dpi = 300)
 ```
 
