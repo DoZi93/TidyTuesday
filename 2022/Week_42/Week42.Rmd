@@ -52,7 +52,7 @@ plot.text.color <- "#7f0000"
 # Write title and subtitle
 ```{r}
 plot.title <- "Stranger Things"
-plot.subtitle <- "Total negative and positive sentiment score\n of all lyrics sung during the four seasons.\n"
+plot.subtitle <- "Total negative and positive sentiment score of all lyrics sung in the series"
 ```
 
 # Load data
@@ -103,7 +103,8 @@ ggplot() +
            y = max(strangerthings_songs$n)+16, 
            label = paste("Season",c("1", "2", "3", "4"), sep = " "),
            family = font_text,
-           colour = plot.text.color) +
+           colour = plot.text.color,
+           size = 14) +
   geom_rect() +
   theme_void() +
   labs(title = plot.title, 
@@ -119,20 +120,21 @@ ggplot() +
                                           linetype = "longdash",
                                           size = .5),
         plot.background = element_rect(fill = "#0E0D0D"),
-        plot.title = element_text(size = 30,
+        plot.title = element_text(size = 50,
                                   color = title.color,
                                   hjust = 0.5,
                                   family = font_text),
-        plot.subtitle = element_text(size = 14,
+        plot.subtitle = element_markdown(size = 38,
                                      color = plot.text.color,
                                      hjust = 0.5,
                                      vjust = -0.2,
                                      family = font_text),
         axis.text.y = element_text(color = plot.text.color,
                                    margin = margin(r = 30),
-                                   family = font_text),
+                                   family = font_text,
+                                   size = 22),
         axis.title.y = element_text(color = plot.text.color,
-                                    size = 14,
+                                    size = 26,
                                     margin = margin(r = 10),
                                     angle = 90,
                                     family = font_text))
